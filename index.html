@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Cadastro de Motores | Projeto CentroWEG - SENAI</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header class="header">
+        <div class="container header-content">
+            <div class="logo-area">
+                <span class="badge-weg">WEG</span>
+                <span class="divider">|</span>
+                <span class="subtitle">CentroWEG &bull; SENAI</span>
+            </div>
+            <nav class="nav">
+                <a href="#sobre">O Projeto</a>
+                <a href="#arquitetura">Estrutura do Código</a>
+                <a href="#codigo">Código-Fonte</a>
+                <a href="#local">CentroWEG</a>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container">
+            <span class="tag-local">Jaraguá do Sul &bull; Santa Catarina</span>
+            <h1>Sistema Monolítico de Cadastro de Motores em Python</h1>
+            <p>
+                Prototipagem de lógica de programação e manipulação de estruturas de dados em memória, 
+                desenvolvida durante a formação técnica no <strong>CentroWEG (SENAI)</strong>.
+            </p>
+        </div>
+    </section>
+
+    <main class="container">
+
+        <section id="sobre" class="section">
+            <h2>Sobre o Projeto</h2>
+            <p>
+                Este software foi criado com foco em testes rápidos de lógica de programação, aplicando o conceito 
+                de <strong>CRUD</strong> (Criar, Ler, Atualizar e Deletar) sem dependência de bancos de dados externos. 
+                Todo o fluxo ocorre em um único arquivo Python, utilizando listas (arrays) e dicionários para 
+                armazenar dados técnicos de motores em tempo de execução.
+            </p>
+        </section>
+
+        <section id="arquitetura" class="section">
+            <h2>Como o Código Funciona</h2>
+            <div class="grid-cards">
+                <div class="card">
+                    <div class="card-header">01. Armazenamento</div>
+                    <h3>Lista &amp; Dicionários</h3>
+                    <p>
+                        A variável global <code>motores = []</code> atua como um array dinâmico. Cada motor cadastrado é 
+                        armazenado como um dicionário contendo <code>id</code>, <code>modelo</code>, <code>fabricante</code>, 
+                        <code>tipo</code> e <code>potencia_cv</code>.
+                    </p>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">02. Modularização</div>
+                    <h3>Funções Dedicadas</h3>
+                    <p>
+                        Cada operação do sistema possui sua própria função: <code>cadastrar_motor()</code>, 
+                        <code>listar_motores()</code>, <code>atualizar_motor()</code> e <code>remover_motor()</code>, 
+                        facilitando a leitura e manutenção.
+                    </p>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">03. Validação</div>
+                    <h3>Tratamento de Erros</h3>
+                    <p>
+                        Blocos <code>try/except</code> garantem que entradas inválidas (como texto no lugar de potência em CV 
+                        ou IDs inexistentes) não interrompam a execução do programa.
+                    </p>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">04. Interface CLI</div>
+                    <h3>Menu Interativo</h3>
+                    <p>
+                        A função <code>menu()</code> mantém um laço contínuo <code>while True</code> no terminal até que 
+                        o usuário selecione a opção <code>0</code> para encerrar a sessão.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section id="codigo" class="section">
+            <h2>Código-Fonte (<code>cadastro_motores.py</code>)</h2>
+            <p class="section-desc">Implementação monolítica completa utilizada para validação em terminal:</p>
+            
+            <div class="code-window">
+                <div class="code-topbar">
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                    <span class="filename">cadastro_motores.py</span>
+                </div>
+                <pre><code># Lista global (array) para armazenar os motores em memória
+motores = []
+proximo_id = 1
+
+def cadastrar_motor():
+    global proximo_id
+    print("\n--- CADASTRAR NOVO MOTOR ---")
+    modelo = input("Modelo do motor: ").strip()
+    fabricante = input("Fabricante: ").strip()
+    tipo = input("Tipo (Elétrico, Combustão, Híbrido, etc.): ").strip()
+    
+    while True:
+        try:
+            potencia_cv = float(input("Potência (em CV): "))
+            break
+        except ValueError:
+            print("Erro: Digite um valor numérico válido para a potência.")
+
+    motor = {
+        "id": proximo_id,
+        "modelo": modelo,
+        "fabricante": fabricante,
+        "tipo": tipo,
+        "potencia_cv": potencia_cv
+    }
+    
+    motores.append(motor)
+    proximo_id += 1
+    print(f"\n[SUCESSO] Motor '{modelo}' cadastrado com ID {motor['id']}!")
+
+def listar_motores():
+    print("\n--- LISTA DE MOTORES CADASTRADOS ---")
+    if not motores:
+        print("Nenhum motor cadastrado no momento.")
+        return
+
+    for m in motores:
+        print(
+            f"ID: {m['id']} | Modelo: {m['modelo']} | "
+            f"Fabricante: {m['fabricante']} | Tipo: {m['tipo']} | "
+            f"Potência: {m['potencia_cv']} CV"
+        )
+
+def buscar_motor_por_id(id_busca):
+    for motor in motores:
+        if motor["id"] == id_busca:
+            return motor
+    return None
+
+def atualizar_motor():
+    print("\n--- ATUALIZAR MOTOR ---")
+    listar_motores()
+    if not motores:
+        return
+
+    try:
+        id_busca = int(input("\nDigite o ID do motor que deseja atualizar: "))
+    except ValueError:
+        print("Erro: ID inválido.")
+        return
+
+    motor = buscar_motor_por_id(id_busca)
+    if not motor:
+        print("Motor não encontrado.")
+        return
+
+    novo_modelo = input(f"Modelo [{motor['modelo']}]: ").strip()
+    if novo_modelo: motor["modelo"] = novo_modelo
+
+    novo_fabricante = input(f"Fabricante [{motor['fabricante']}]: ").strip()
+    if novo_fabricante: motor["fabricante"] = novo_fabricante
+
+    novo_tipo = input(f"Tipo [{motor['tipo']}]: ").strip()
+    if novo_tipo: motor["tipo"] = novo_tipo
+
+    nova_potencia = input(f"Potência CV [{motor['potencia_cv']}]: ").strip()
+    if nova_potencia:
+        try:
+            motor["potencia_cv"] = float(nova_potencia)
+        except ValueError:
+            print("Potência inválida. Mantendo o valor anterior.")
+
+    print("\n[SUCESSO] Dados do motor atualizados!")
+
+def remover_motor():
+    print("\n--- REMOVER MOTOR ---")
+    listar_motores()
+    if not motores:
+        return
+
+    try:
+        id_busca = int(input("\nDigite o ID do motor que deseja remover: "))
+    except ValueError:
+        print("Erro: ID inválido.")
+        return
+
+    motor = buscar_motor_por_id(id_busca)
+    if not motor:
+        print("Motor não encontrado.")
+        return
+
+    motores.remove(motor)
+    print(f"\n[SUCESSO] Motor '{motor['modelo']}' (ID {id_busca}) removido!")
+
+def menu():
+    while True:
+        print("\n===============================")
+        print("   SISTEMA DE CADASTRO DE MOTORES")
+        print("===============================")
+        print("1. Cadastrar motor")
+        print("2. Listar motores")
+        print("3. Atualizar motor")
+        print("4. Remover motor")
+        print("0. Sair")
+        
+        opcao = input("\nEscolha uma opção: ").strip()
+
+        if opcao == "1": cadastrar_motor()
+        elif opcao == "2": listar_motores()
+        elif opcao == "3": atualizar_motor()
+        elif opcao == "4": remover_motor()
+        elif opcao == "0": break
+        else: print("Opção inválida!")
+
+if __name__ == "__main__":
+    menu()</code></pre>
+            </div>
+        </section>
+
+        <section id="local" class="section local-box">
+            <div class="local-info">
+                <span class="badge-senai">FORMAÇÃO TÉCNICA E INDUSTRIAL</span>
+                <h2>Desenvolvido no CentroWEG (SENAI)</h2>
+                <p>
+                    Este projeto foi desenvolvido nas dependências do <strong>CentroWEG</strong>, unidade educacional 
+                    do <strong>SENAI</strong> integrada ao parque fabril da <strong>WEG</strong> em 
+                    <strong>Jaraguá do Sul – SC</strong>.
+                </p>
+                <p>
+                    O ambiente une teoria e prática voltadas à indústria e à tecnologia, preparando profissionais 
+                    com foco em eficiência, qualidade técnica e inovação industrial.
+                </p>
+            </div>
+            <div class="local-meta">
+                <div class="meta-item">
+                    <strong>Instituição</strong>
+                    <span>SENAI / CentroWEG</span>
+                </div>
+                <div class="meta-item">
+                    <strong>Localização</strong>
+                    <span>Jaraguá do Sul, Santa Catarina - Brasil</span>
+                </div>
+                <div class="meta-item">
+                    <strong>Tecnologia</strong>
+                    <span>Python 3 (Estruturas de Dados em Memória)</span>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>Documentação de Projeto &bull; Desenvolvido no CentroWEG (SENAI) &bull; Jaraguá do Sul - SC</p>
+        </div>
+    </footer>
+
+</body>
+</html>
